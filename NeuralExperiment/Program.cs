@@ -31,12 +31,14 @@ namespace NeuralExperiment
             }
         }
 
+        /// <summary>
+        /// Train the network with random data.
+        /// </summary>
+        /// <returns>Populated network</returns>
         private static ActivationNetwork Learn()
         {
-            // Random number generation
-
-
             // Initialize network
+            // This layer structures is somewhat random...
             var network = new ActivationNetwork(new SigmoidFunction(), 6, 10, 10, 5);
 
             // Initialize learner (BackPropagation)
@@ -45,14 +47,19 @@ namespace NeuralExperiment
             var error = 1.0;
             var sampleCount = 0;
 
+            // Learn until error rate is below 0.000001 (might be too extreme)
             while (error > 0.000001)
             {
+                // Generate student data
                 var studentData = GenerateStudent();
 
+                // Calculate score
                 var totalScore = GetScore(studentData);
-
+                
+                // Get encoded result
                 var result = EncodeResult(totalScore);
 
+                // Train with the data
                 error = learner.Run(studentData.listingData.Concatenate(studentData.attendance), result);
                 //Console.WriteLine($"Error Rate: {error.ToString(CultureInfo.InvariantCulture)}");
                 sampleCount++;
@@ -62,13 +69,19 @@ namespace NeuralExperiment
             return network;
         }
 
+        /// <summary>
+        /// Calculate based on the constructed network
+        /// </summary>
+        /// <param name="network">Populated network</param>
         private static void Calculate(Network network)
         {
             var correct = 0;
             var wrong = 0;
 
+            // Process 1000 students
             for (var i = 0; i < 1000; i++)
             {
+                // Get random student
                 var student = GenerateStudent();
 
                 Console.Write($"Student {i} - ");
@@ -79,6 +92,7 @@ namespace NeuralExperiment
 
                 Console.Write($"Attendance: {student.attendance} / ");
 
+                // Get score and grade
                 var score = GetScore(student);
                 var grade = GetGrade(score);
 
@@ -96,6 +110,11 @@ namespace NeuralExperiment
             Console.WriteLine($"Correct: {correct} / Wrong {wrong}");
         }
 
+        /// <summary>
+        /// Get score from student data
+        /// </summary>
+        /// <param name="studentData">Student data tuple</param>
+        /// <returns>Score for the student</returns>
         private static double GetScore((double[] calculationData, double[] listingData, double attendance) studentData)
         {
             var quizScore = (studentData.calculationData[0] + studentData.calculationData[1] +
@@ -105,6 +124,10 @@ namespace NeuralExperiment
             return quizScore * 0.95 + studentData.attendance * 0.05;
         }
 
+        /// <summary>
+        /// Generate random student
+        /// </summary>
+        /// <returns>Student data tuple</returns>
         private static (double[] calculationData, double[] listingData, double attendance) GenerateStudent()
         {
             // Quiz
@@ -122,6 +145,11 @@ namespace NeuralExperiment
             return (quizForCalculation, quizForList, attendance);
         }
 
+        /// <summary>
+        /// Encode the score into encoded grade
+        /// </summary>
+        /// <param name="score">Score to encode</param>
+        /// <returns>Encoded grade</returns>
         private static double[] EncodeResult(double score)
         {
             var result = new double[5];
@@ -143,16 +171,26 @@ namespace NeuralExperiment
             return result;
         }
 
+        /// <summary>
+        /// Get grade from the score
+        /// </summary>
+        /// <param name="score">Score to conver to grade</param>
+        /// <returns>Grade</returns>
         private static string GetGrade(double score)
         {
             var encoded = EncodeResult(score);
             return GetGrade(encoded);
         }
 
-        private static string GetGrade(double[] result)
+        /// <summary>
+        /// Get grade from encoded score
+        /// </summary>
+        /// <param name="score">Encoded score</param>
+        /// <returns>Grade</returns>
+        private static string GetGrade(double[] score)
         {
-            var maxValue = result.Max();
-            var maxIndex = result.ToList().IndexOf(maxValue);
+            var maxValue = score.Max();
+            var maxIndex = score.ToList().IndexOf(maxValue);
 
             switch (maxIndex)
             {
@@ -173,6 +211,11 @@ namespace NeuralExperiment
             }
         }
 
+        /// <summary>
+        /// Drop the lowest score from "quiz" score
+        /// </summary>
+        /// <param name="scores">List of quiz score</param>
+        /// <returns>Quiz score with lowest one removed</returns>
         private static List<double> DropLowest(List<double> scores)
         {
             scores.Sort();
