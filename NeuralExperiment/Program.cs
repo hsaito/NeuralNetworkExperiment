@@ -39,7 +39,7 @@ namespace NeuralExperiment
         {
             // Initialize network
             // This layer structures is somewhat random...
-            var network = new ActivationNetwork(new SigmoidFunction(), 6, 10, 10, 5);
+            var network = new ActivationNetwork(new SigmoidFunction(), 6, 8, 8, 5);
 
             // Initialize learner (BackPropagation)
             var learner = new BackPropagationLearning(network);
