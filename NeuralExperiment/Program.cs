@@ -12,6 +12,20 @@ namespace NeuralExperiment
     {
         private static readonly Random Random = new Random();
 
+        /// <summary>
+        ///     Augmented random number which is 30% scewed toward 100 points
+        /// </summary>
+        private static int AugmentedRandomNumber
+        {
+            get
+            {
+                var rand = Random.Next() % 130;
+                if (rand > 100)
+                    rand = 100;
+                return rand;
+            }
+        }
+
         private static void Main(string[] args)
         {
             Network network;
@@ -32,7 +46,7 @@ namespace NeuralExperiment
         }
 
         /// <summary>
-        /// Train the network with random data.
+        ///     Train the network with random data.
         /// </summary>
         /// <returns>Populated network</returns>
         private static ActivationNetwork Learn()
@@ -48,14 +62,14 @@ namespace NeuralExperiment
             var sampleCount = 0;
 
             // Learn until error rate is below 0.000001 (might be too extreme)
-            while (error > 0.000001)
+            while (error > 0.0000001)
             {
                 // Generate student data
                 var studentData = GenerateStudent();
 
                 // Calculate score
                 var totalScore = GetScore(studentData);
-                
+
                 // Get encoded result
                 var result = EncodeResult(totalScore);
 
@@ -70,7 +84,7 @@ namespace NeuralExperiment
         }
 
         /// <summary>
-        /// Calculate based on the constructed network
+        ///     Calculate based on the constructed network
         /// </summary>
         /// <param name="network">Populated network</param>
         private static void Calculate(Network network)
@@ -111,7 +125,7 @@ namespace NeuralExperiment
         }
 
         /// <summary>
-        /// Get score from student data
+        ///     Get score from student data
         /// </summary>
         /// <param name="studentData">Student data tuple</param>
         /// <returns>Score for the student</returns>
@@ -125,7 +139,7 @@ namespace NeuralExperiment
         }
 
         /// <summary>
-        /// Generate random student
+        ///     Generate random student
         /// </summary>
         /// <returns>Student data tuple</returns>
         private static (double[] calculationData, double[] listingData, double attendance) GenerateStudent()
@@ -133,20 +147,20 @@ namespace NeuralExperiment
             // Quiz
             var quiz = new List<double>();
             for (var j = 0; j < 6; j++)
-                quiz.Add(Convert.ToDouble(Random.Next() % 100) / 100);
+                quiz.Add(Convert.ToDouble(AugmentedRandomNumber) / 100);
 
             // Drop the lowest score
             var quizForCalculation = DropLowest(quiz).ToArray();
             var quizForList = quiz.ToArray();
 
             // Attendance
-            var attendance = (double) (Random.Next() % 100) / 100;
+            var attendance = (double) AugmentedRandomNumber / 100;
 
             return (quizForCalculation, quizForList, attendance);
         }
 
         /// <summary>
-        /// Encode the score into encoded grade
+        ///     Encode the score into encoded grade
         /// </summary>
         /// <param name="score">Score to encode</param>
         /// <returns>Encoded grade</returns>
@@ -172,7 +186,7 @@ namespace NeuralExperiment
         }
 
         /// <summary>
-        /// Get grade from the score
+        ///     Get grade from the score
         /// </summary>
         /// <param name="score">Score to conver to grade</param>
         /// <returns>Grade</returns>
@@ -183,7 +197,7 @@ namespace NeuralExperiment
         }
 
         /// <summary>
-        /// Get grade from encoded score
+        ///     Get grade from encoded score
         /// </summary>
         /// <param name="score">Encoded score</param>
         /// <returns>Grade</returns>
@@ -212,7 +226,7 @@ namespace NeuralExperiment
         }
 
         /// <summary>
-        /// Drop the lowest score from "quiz" score
+        ///     Drop the lowest score from "quiz" score
         /// </summary>
         /// <param name="scores">List of quiz score</param>
         /// <returns>Quiz score with lowest one removed</returns>
